@@ -5,9 +5,6 @@ import tripRoutes from "./src/routes/tripRoutes";
 import reservationRoutes from "./src/routes/reservationRoutes";
 
 const app = express();
-app.use(express.json());
-app.use("/api", tripRoutes);
-app.use("/api", reservationRoutes);
 
 app.use(
 	cors({
@@ -17,6 +14,10 @@ app.use(
 		optionsSuccessStatus: 204,
 	}),
 );
+
+app.use(express.json());
+app.use("/", tripRoutes);
+app.use("/", reservationRoutes);
 
 app.options("*", cors());
 

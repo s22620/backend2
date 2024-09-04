@@ -9,11 +9,40 @@ type UpdateReservationRequest = ReservationRequest;
 type DeleteReservationRequest = Request<{ id: string }, {}, {}>;
 
 export const getReservations = async (req: Request, res: Response): Promise<void> => {
+	const userRole = req.headers["user-role"]; // Zakładamy, że rola jest przesyłana w nagłówku (np. z tokena)
+
+	if (userRole !== "admin") {
+		res.status(403).json({ error: "Access denied. Admins only." });
+		return;
+	}
+
 	try {
-		const reservations = await prisma.reservation.findMany();
+		const reservations = await prisma.reservation.findMany({
+			include: { trip: true },
+		});
 		res.json(reservations);
 	} catch (error) {
 		res.status(500).json({ error: "Failed to fetch reservations" });
+	}
+};
+
+export const getAllUserReservations = async (req: Request, res: Response): Promise<void> => {
+	const userEmail = req.headers["user-email"]; // Używamy adresu email przesłanego w nagłówku
+
+	if (!userEmail) {
+		res.status(400).json({ error: "User email is required" });
+		return;
+	}
+
+	try {
+		const reservations = await prisma.reservation.findMany({
+			where: { email: userEmail as string },
+			include: { trip: true }, // Pobierz powiązane wycieczki, jeśli potrzebujesz
+		});
+
+		res.json(reservations);
+	} catch (error) {
+		res.status(500).json({ error: "Failed to fetch reservations for the user" });
 	}
 };
 
@@ -61,18 +90,21 @@ export const updateReservation = async (
 ): Promise<void> => {
 	const { id } = req.params;
 	const { tripId, name, email, date, numAdults, numChildren } = req.body;
+
 	try {
+		// Aktualizacja tylko pól, które zostały podane w body
 		const reservation = await prisma.reservation.update({
 			where: { id },
 			data: {
-				tripId,
-				name,
-				email,
-				date: date ? new Date(date) : undefined,
-				numAdults: numAdults ? parseInt(numAdults.toString(), 10) : undefined,
-				numChildren: numChildren ? parseInt(numChildren.toString(), 10) : undefined,
+				...(tripId && { tripId }),
+				...(name && { name }),
+				...(email && { email }),
+				...(date && { date: new Date(date) }),
+				...(numAdults !== undefined && { numAdults: parseInt(numAdults.toString(), 10) }),
+				...(numChildren !== undefined && { numChildren: parseInt(numChildren.toString(), 10) }),
 			},
 		});
+
 		res.json(reservation);
 	} catch (error) {
 		res.status(500).json({ error: "Failed to update reservation" });

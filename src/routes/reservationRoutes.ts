@@ -5,11 +5,13 @@ import {
 	getReservation,
 	updateReservation,
 	deleteReservation,
+	getAllUserReservations,
 } from "../records/reservationRecords";
 
 const router = express.Router();
 
-router.get("/reservations", getReservations);
+router.get("/reservations", getReservations); // Tylko dla admina
+router.get("/reservations/user", getAllUserReservations); // Dla użytkownika
 router.get("/reservations/:id", getReservation);
 router.post("/reservations", createReservation);
 router.put("/reservations/:id", updateReservation);
