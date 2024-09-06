@@ -72,14 +72,33 @@ export const updateTrip = async (req: UpdateTripRequest, res: Response): Promise
 	}
 };
 
-export const deleteTrip = async (req: DeleteTripRequest, res: Response): Promise<void> => {
+export const deleteTrip = async (req: Request, res: Response) => {
 	const { id } = req.params;
+
+	if (!id) {
+		return res.status(400).json({ error: "Trip ID is required" });
+	}
+
 	try {
+		const trip = await prisma.trip.findUnique({
+			where: { id },
+		});
+
+		if (!trip) {
+			return res.status(404).json({ error: "Trip not found" });
+		}
+
+		await prisma.reservation.deleteMany({
+			where: { tripId: id }, // tu poprawna logika dla powiązanych rezerwacji
+		});
+
 		await prisma.trip.delete({
 			where: { id },
 		});
-		res.json({ message: "Trip deleted successfully" });
+
+		return res.status(200).json({ message: "Trip deleted successfully" });
 	} catch (error) {
-		res.status(500).json({ error: "Failed to delete trip" });
+		console.error("Error deleting trip:", error);
+		return res.status(500).json({ error: "Internal server error" });
 	}
 };

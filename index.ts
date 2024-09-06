@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import tripRoutes from "./src/routes/tripRoutes";
 import reservationRoutes from "./src/routes/reservationRoutes";
+import stripeRoutes from "./src/routes/stripeRoutes";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(
 app.use(express.json());
 app.use("/", tripRoutes);
 app.use("/", reservationRoutes);
+app.use("/", stripeRoutes);
 
 app.options("*", cors());
 

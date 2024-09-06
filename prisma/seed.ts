@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 const seed = async () => {
 	// Najpierw wyczyść istniejące dane
+	await prisma.reservation.deleteMany({});
 	await prisma.trip.deleteMany({});
 
 	// Następnie seeduj nowe dane

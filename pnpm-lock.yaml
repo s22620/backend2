@@ -32,6 +32,9 @@ importers:
       prisma:
         specifier: ^5.19.1
         version: 5.19.1
+      stripe:
+        specifier: ^16.9.0
+        version: 16.9.0
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@types/node@20.16.3)(typescript@5.5.4)
@@ -1017,6 +1020,10 @@ packages:
   strip-json-comments@2.0.1:
     resolution: {integrity: sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==}
     engines: {node: '>=0.10.0'}
+
+  stripe@16.9.0:
+    resolution: {integrity: sha512-SgzwdMgWNe1FD1A1WevZ/wuv8b4yWz8SiG/vO7Pf4cBl0qat20Clz8Zself+tcbB+fuMkZJrjJ2WmarIgXfCow==}
+    engines: {node: '>=12.*'}
 
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
@@ -2110,6 +2117,11 @@ snapshots:
   strip-bom@3.0.0: {}
 
   strip-json-comments@2.0.1: {}
+
+  stripe@16.9.0:
+    dependencies:
+      '@types/node': 20.16.3
+      qs: 6.11.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
 

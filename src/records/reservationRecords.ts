@@ -62,25 +62,23 @@ export const getReservation = async (req: ReservationRequest, res: Response): Pr
 	}
 };
 
-export const createReservation = async (
-	req: CreateReservationRequest,
-	res: Response,
-): Promise<void> => {
-	const { tripId, name, email, date, numAdults, numChildren } = req.body;
+export const createReservation = async (req: Request, res: Response): Promise<void> => {
+	const { tripId, email, numAdults, numChildren } = req.body;
+
 	try {
+		// Tworzenie rezerwacji tylko z tripId i innymi podstawowymi danymi
 		const reservation = await prisma.reservation.create({
 			data: {
 				tripId,
-				name,
 				email,
-				date: new Date(date),
-				numAdults: parseInt(numAdults.toString(), 10),
-				numChildren: parseInt(numChildren.toString(), 10),
+				numAdults,
+				numChildren,
 			},
 		});
 		res.status(201).json(reservation);
 	} catch (error) {
-		res.status(500).json({ error: "Failed to create reservation" });
+		console.error("Błąd tworzenia rezerwacji:", error);
+		res.status(500).json({ error: "Nie udało się utworzyć rezerwacji" });
 	}
 };
 
@@ -89,17 +87,14 @@ export const updateReservation = async (
 	res: Response,
 ): Promise<void> => {
 	const { id } = req.params;
-	const { tripId, name, email, date, numAdults, numChildren } = req.body;
+	const { tripId, email, numAdults, numChildren } = req.body;
 
 	try {
-		// Aktualizacja tylko pól, które zostały podane w body
 		const reservation = await prisma.reservation.update({
 			where: { id },
 			data: {
 				...(tripId && { tripId }),
-				...(name && { name }),
 				...(email && { email }),
-				...(date && { date: new Date(date) }),
 				...(numAdults !== undefined && { numAdults: parseInt(numAdults.toString(), 10) }),
 				...(numChildren !== undefined && { numChildren: parseInt(numChildren.toString(), 10) }),
 			},
@@ -107,6 +102,7 @@ export const updateReservation = async (
 
 		res.json(reservation);
 	} catch (error) {
+		console.error("Error updating reservation:", error);
 		res.status(500).json({ error: "Failed to update reservation" });
 	}
 };
